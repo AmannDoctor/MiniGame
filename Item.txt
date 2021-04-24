@@ -1,0 +1,4 @@
+1 ; Sword ; A single-edged curved bladed cavalry sword.
+2 ; Shield ; A small round, metal shield with a logo of Boar with the text 'Audentes Fortuna Juvat' around it.
+3 ; Candle ; A candle that generates infinity amount of light.
+4 ; Dice Set ; A set of seven dice, ranging from 4 sided to 20 sided.
