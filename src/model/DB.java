@@ -15,7 +15,7 @@ import java.sql.Statement;
  * Purpose:Has Query and Update DB
  */
 abstract public class DB {
-    protected String dbName = "Game.db";
+    protected String dbName = "ScientistDBFinalized";
     protected String sJdbc;
     protected String sDriverName;
     protected Connection conn;

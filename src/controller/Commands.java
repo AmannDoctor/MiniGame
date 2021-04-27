@@ -2,10 +2,12 @@ package controller;
 
 import gameExceptions.*;
 
+import model.SQLiteDB;
 import view.Adventure;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 /**Class: Commands
  * @author Mackinnon Jackson
@@ -22,11 +24,12 @@ public class Commands {
 
     private String prevRoomDirec=new String();
 
-    public static final List<Character> VALID_DIRECTIONS = Arrays.asList('N', 'S', 'E', 'W'),
-            ITEM_COMMANDS= Arrays.asList('G','D','I','U','E'),OVERALL_COMMANDS=Arrays.asList('E','S','G','D');
+    public static final List<Character> VALID_DIRECTIONS = Arrays.asList('N', 'S', 'E', 'W'),OVERALL_COMMANDS=Arrays.asList('E','S','G','D');
     public static final Character HELP_COMMAND='H';
-    public static final List<String> FIGHT_COMMANDS = Arrays.asList("FIGHT","DEFEND","RUN");
+    public static final List<String> FIGHT_COMMANDS = Arrays.asList("FIGHT","DEFEND","RUN"),
+            ITEM_COMMANDS= Arrays.asList("GET","DROP","INSPECT","UNEQUIP","EQUIP");
     public static final int EXIT_COMMAND=7;
+    public boolean combatInitiated=false;
 
     public Commands(){
 
@@ -61,7 +64,6 @@ public class Commands {
         }
         else if (validateCommand==2) {
             try{
-
             stringOutput= move(cmd,room);
             }
             catch (IOException e){
@@ -73,6 +75,7 @@ public class Commands {
         }
         else if (validateCommand==4) {stringOutput= player.printInventory();}
         else if (validateCommand==5){stringOutput=fightCmds(cmd, room);}
+
         else if (validateCommand==7) {
             stringOutput = "Thank you for playing my game!";
         }
@@ -145,8 +148,6 @@ public class Commands {
             for (Item i : player.getInventory()) {
                 if (i.getName().equalsIgnoreCase(stringOutput)) {
 
-                    /**Fill in with use counter*/
-
 
                     itemDoesNotExist = false;
                 }
@@ -175,15 +176,56 @@ public class Commands {
 
     public String equipItem(String cmd, Room room) throws IOException{
 
-       String stringOutput=commandTrimmer(cmd);
+        String stringOutput=commandTrimmer(cmd);
         boolean itemDoesNotExist=true;
         try {
             for (Item i : player.getInventory()) {
                 if (i.getName().equalsIgnoreCase(stringOutput)&&i.isEquipable()) {
 
                     /**Fill in with Equip Code*/
+                    System.out.println("Equip items?");
+
+                    System.out.println("Would you like to equip" + i.getName()+"?\nYes:\nNo");
+                    Scanner sc = new Scanner(System.in);
+                    String choice = sc.next();
+                    if(choice.equalsIgnoreCase("yes"))
+                        player.equipItem(i);
+                    else
+                        System.out.println("Nevermind");
+                    itemDoesNotExist = false;
+                }
+                else{
+                    throw new InvalidItemException();
+                }
+            }
+        }
+        catch (InvalidItemException e){
+            stringOutput=e.toString();
+        }
+        if(itemDoesNotExist){
+            throw new IOException("This item does not exist to be inspected");
+        }
+        return stringOutput;
+    }
+
+    public String unequipItem(String cmd, Room room) throws IOException{
+
+        String stringOutput=commandTrimmer(cmd);
+        boolean itemDoesNotExist=true;
+        try {
+            for (Item i : player.getInventory()) {
+                if (i.getName().equalsIgnoreCase(stringOutput)&&i.isEquipable()) {
 
 
+                    System.out.println("unequip items?");
+
+                    System.out.println("Would you like to unequip" + i.getName()+"?\nYes:\nNo");
+                    Scanner sc = new Scanner(System.in);
+                    String choice = sc.next();
+                    if(choice.equalsIgnoreCase("yes"))
+                        player.unEquip(i);
+                    else
+                        System.out.println("Nevermind");
                     itemDoesNotExist = false;
                 }
                 else{
@@ -205,7 +247,7 @@ public class Commands {
         String[] ing=cmd.split(" ");
         String stringOutput="";
 
-        for (int i = 1; i < ing.length; i++) {
+        for (int i =  1; i < ing.length; i++) {
             stringOutput = stringOutput + ing[i] + " ";
         }
 
@@ -231,7 +273,7 @@ public class Commands {
     int commandInt=0;
     if (commandGrabber[0].equalsIgnoreCase("go")&&VALID_DIRECTIONS.contains(commandGrabber[1].charAt(0))) {
         commandInt=2;
-    }else if (ITEM_COMMANDS.contains(cmdLine.charAt(0))&&commandGrabber.length>1) {
+    }else if (ITEM_COMMANDS.contains(cmdLine.toUpperCase())&&commandGrabber.length>1) {
         commandInt=1;
     } else if (cmdLine.equalsIgnoreCase("b") || cmdLine.equalsIgnoreCase("backpack")) {
         commandInt=4;
@@ -317,9 +359,6 @@ public class Commands {
         else if(cmd.equals('W')){
             prevRoomDirec="EAST";
         }
-
-
-
     }
 
 
@@ -353,11 +392,8 @@ public class Commands {
         for (Item roomItem: room.getRoomItems()) {roomItemString.add(roomItem.getName().toUpperCase());}
 
         String stringOutput="";
-        boolean dropChecker=(itemNameGrabber[0].equalsIgnoreCase("d") || itemNameGrabber[0].equalsIgnoreCase("drop")),
-                inspectChecker=(itemNameGrabber[0].equalsIgnoreCase("i") || itemNameGrabber[0].equalsIgnoreCase("inspect")),
-                getChecker=(itemNameGrabber[0].equalsIgnoreCase("g") || itemNameGrabber[0].equalsIgnoreCase("get"));
 
-        if (dropChecker) {
+        if (itemNameGrabber[0].equalsIgnoreCase("drop")) {
                 if(!playerItemsString.contains(itemNameGrabber[1])){
                     throw new InvalidCommandException(itemNameGrabber[1]+" does not exist in the players backpack");
                 }
@@ -365,7 +401,7 @@ public class Commands {
                     stringOutput = drop(itemNameGrabber[1], room);
                 }
             }
-            else if (getChecker) {
+            else if (itemNameGrabber[0].equalsIgnoreCase("get")) {
                 if(!roomItemString.contains(itemNameGrabber[1])){
                     throw new InvalidRoomException(itemNameGrabber[1]+" does not exist in this room.");}
                 else{
@@ -374,14 +410,25 @@ public class Commands {
 
                 }
             }
-            else if(inspectChecker){
+            else if(itemNameGrabber[0].equalsIgnoreCase("inspect")){
             try {
                 stringOutput = lookItem(cmd, room);
             }catch(IOException e){
                 stringOutput=e.toString();
-            }
+            }}
+            else if(itemNameGrabber[0].equalsIgnoreCase("equip")){
+            try {
+                stringOutput = equipItem(cmd, room);
+            }catch(IOException e){
+                stringOutput=e.toString();
+            }}
+        else if(itemNameGrabber[0].equalsIgnoreCase("unequip")){
+            try {
+                stringOutput = equipItem(cmd, room);
+            }catch(IOException e){
+                stringOutput=e.toString();
+            }}
 
-        }
 
             return stringOutput;
     }
@@ -466,7 +513,7 @@ public class Commands {
 
 
 
-    public String save(){
+    public String saveGame(){
         File dbFile = new File("PLAYER_"+player.getName()+".db");
         if (!dbFile.exists()) {
             CreateFilesController cfc = new CreateFilesController();
@@ -477,26 +524,89 @@ public class Commands {
                 System.out.println(ge.getMessage());
             }
         }
-
-
-
         return "You saved your game";
+
+    }
+    public  String loadGame(int score) throws SQLException, ClassNotFoundException {
+
+        SQLiteDB svdT=new SQLiteDB();
+
+
+
+        return "Loaded "+player.getName()+" Game Sucessfully";
     }
 
 
 
-    public String hint(String cmd,Room room){
-
-
-        return "Hint text";
+    public String hint(String cmd,Room room) throws InvalidRoomException {
+        return "h";
     }
 
 
 
-    public String help(String cmd, Room r){
-        Help txt=new Help();
+    public String help(String cmd, Room r) throws InvalidRoomException {
 
-        return "Help text";
+        System.out.println("""
+                The frog ribbits: ‘What do you need help with?’
+                1. Show me a list of commands, please!
+                2. Could you give me a hint, oh great frog?”
+                3. I would like to see this room’s description again.
+                4. What is my status?    
+                """);
+        Scanner in=new Scanner(System.in);
+        int o= in.nextInt();
+        String out="";
+        if(o==1){
+            out= """
+                        List of commands:\s
+                        -----------------------
+                        Go Direction
+                        Grab
+                        Equip
+                        Unequip
+                        Use
+                        Drop
+                        Examine
+                        Backpack
+                        Fight
+                        Defend
+                        Run
+                        Help
+                        Save
+                        Exit
+                                                
+                        """;
+        } else if(o==2){
+
+            /**HINT AREA*/
+
+
+         /**   if(r.getHints()!=null){
+                out=hint(cmd, r);
+            }
+           else{out="The frog hops around at your feet before glancing up at you and ribbiting ‘Sorry, friend, it doesn’t look like there’s anything important here!’";}*/
+
+
+
+
+        }
+
+        else if(o==3){
+            out=r.display();
+        }
+        else if(o==4){
+            out="Your current Health is: "+player.getHp()+
+                    "\n Your current Strength is: "+player.getStr()+
+                    "\n You have "+player.getScore()+" points \n Nice Job!";
+        }
+        else{
+            out="Please enter a valid number";
+        }
+
+
+
+        return out;
+
     }
 
 
@@ -532,7 +642,7 @@ public class Commands {
     public String fight(Room x) throws InvalidMonsterException, InvalidRoomException {
         String output="Fighting Text";
 
-        if (x.getMonster() == null) {
+    /**    if (x.getMonster() == null) {
             throw new InvalidMonsterException();
         }
         if(x.getMonster().defends()){
@@ -542,12 +652,11 @@ public class Commands {
             if((x.getMonster().getHealth()-player.getStr())<=0){
                 x.dropItem(x.getMonster().getDropItem());
                 //Need to set the monster as a separate entity and set it to be defeated and Update it
-               /** x.updateRoom();*/
+
             }
             output="Mon HP: "+(x.getMonster().getHealth()-player.getStr());
         }
-
-
+     */
 
         return output;
     }
@@ -563,11 +672,24 @@ public class Commands {
             output="You sucessfully defended yourself";
         }
         else{
-            output="You did were not able to defend yourself\n"+(player.getHp()-x.getMonster().getDamage())+" HP left";
+         //   output="You did were not able to defend yourself\n"+(player.getHp()-x.getMonster().getDamage())+" HP left";
 
         }
         return output;
     }
+
+
+
+
+    /**Need to do*/
+    public String puzzles(Room r, String cmd){
+
+
+
+        return "You completed the puzzle";
+    }
+
+
 
 
     }

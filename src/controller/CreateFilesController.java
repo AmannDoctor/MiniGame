@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import gameExceptions.GameException;
 import model.GameDBCreate;
+import model.SavedGameDBCreate;
 
 /**
  * Class : CreateFilesController.java
@@ -28,5 +29,14 @@ public class CreateFilesController {
         catch (SQLException | ClassNotFoundException e) {
             throw new GameException("Creation failed");
         }
+    }
+    public void saveFile() throws GameException{
+        try {
+            SavedGameDBCreate sdb= new SavedGameDBCreate();
+            sdb.saveGame(new Player());}
+        catch (SQLException | ClassNotFoundException e) {
+                throw new GameException("Creation failed");
+            }
+
     }
 }

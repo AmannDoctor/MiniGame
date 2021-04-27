@@ -31,12 +31,16 @@ public class MonsterRoomDB {
         SQLiteDB sdb = new SQLiteDB();
         ResultSet rs = sdb.queryDB(sql);
         if (rs.next()) {
+
+            /**Need to add in damage)*/
+
+
+
             mr.setMonsterNumber(rs.getInt("monsterNumber"));
             mr.setMonsterName(rs.getString("monsterName"));
             mr.setMonsterDescription(rs.getString("monsterDescription"));
             mr.setHitPoints(rs.getInt("hitPoints"));
-            mr.setMaxDamage(rs.getInt("maxDamage"));
-            mr.setMinDamage(rs.getInt("minDamage"));
+
             mr.setRoomNumber(rs.getInt("roomNumber"));
             mr.setRoomName(rs.getString("roomName"));
             mr.setRoomDescription(rs.getString("roomDescription"));
@@ -62,7 +66,7 @@ public class MonsterRoomDB {
         ResultSet rs = sdb.queryDB(sql);
         while (rs.next()) {
             MonsterRoom mr = new MonsterRoom();
-            mr.setMonsterNumber(rs.getInt("monsterNumber"));
+            mr.setMonsterNumber(rs.getInt("monsterID"));
             mr.setMonsterName(rs.getString("monsterName"));
             mr.setMonsterDescription(rs.getString("monsterDescription"));
             mr.setHitPoints(rs.getInt("hitPoints"));

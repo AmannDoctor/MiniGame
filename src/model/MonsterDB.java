@@ -45,7 +45,7 @@ import java.util.ArrayList;
         public Monster getMonster(int id) throws SQLException, ClassNotFoundException {
             SQLiteDB sdb = new SQLiteDB();
             Monster mon = new Monster();
-            String sql = "Select * from Monster WHERE monsterNumber = " + id;
+            String sql = "Select * from Monster WHERE monsterID = " + id;
             ResultSet rs = sdb.queryDB(sql);
             if (rs.next()) {
                 mon.setMonsterID(rs.getInt("monsterID"));

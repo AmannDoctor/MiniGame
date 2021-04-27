@@ -2,7 +2,10 @@ package controller;
 
 
 import gameExceptions.*;
+import model.ExitRoomDB;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**Class: Exit
@@ -19,7 +22,15 @@ public class Exit {
     private String direction;
     private int roomNum;
     private final List<String> VALID_DIRECTION= Arrays.asList("N","S","E","W","U","D","NORTH","SOUTH","EAST","WEST","UP","DOWN");
+
     public Exit(){
+        ExitRoomDB erdb= new ExitRoomDB();
+        try {
+        roomNum= erdb.getNextExit();
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
 
     }
 
@@ -58,4 +69,14 @@ public class Exit {
         setDirection(keyValue[0]);
         setRoomNum(Integer.valueOf(keyValue[1]));
     }
+
+
+    public void buildExit(String direction,String roomNumber) throws InvalidExitException{
+        if ((!VALID_DIRECTION.contains(direction.toUpperCase()))){
+            throw new InvalidExitException("This is not a valid exit");
+        }
+        setDirection(direction);
+        setRoomNum(Integer.valueOf(roomNumber));
+    }
+
 }

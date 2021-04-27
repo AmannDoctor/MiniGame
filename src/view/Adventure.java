@@ -6,6 +6,7 @@ import gameExceptions.InvalidExitException;
 
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 /** Class: Adventure
  *Creator: Mackinnon Jackson
@@ -83,12 +84,21 @@ public class Adventure {
                 """);
 
         String playersCommand="";
+        try{
+        System.out.println(gc.getAllItemsData());}
+         catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         while (!playersCommand.equalsIgnoreCase("x")) {
                 try {
                     System.out.println(room.display());
                     System.out.println("Please enter a command down below:");
                     playersCommand = getCommand();
                     System.out.println(gc.executeCommand(playersCommand, room));
+
+
                 }
                 catch(IOException e){
                 System.out.println(e.getMessage());
@@ -101,6 +111,7 @@ public class Adventure {
     public static void main(String[] args) {
         Adventure adventure=new Adventure();
         adventure.input = new Scanner(System.in);
+
         adventure.playGame();
         adventure.input.close();
 

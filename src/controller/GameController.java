@@ -1,6 +1,7 @@
 package controller;
 
 import gameExceptions.*;
+import model.ExitRoomDB;
 import model.MapModel;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class GameController {
         try
         {
             commandOutput = commands.executeCommand(command, room);
+
         }
         catch(IOException e){
             commandOutput=e.getMessage();
@@ -165,5 +167,30 @@ public class GameController {
         }
         return mrStrs;
     }
+
+    public ArrayList<String> getAllItemsData() throws SQLException, ClassNotFoundException {
+        Item i=new Item();
+        ArrayList<Item> items = null;
+        items = i.getAllItems();
+        ArrayList<String> itemStr = new ArrayList<String>();
+        for (Item item : items) {
+            itemStr.add(item.toString());
+        }
+        return itemStr;
+    }
+    /**public ArrayList<String> getAllExitRoomData() throws SQLException, ClassNotFoundException{
+        Exit er = new Exit();
+        ArrayList<Exit> exitArrayList = null;
+        exitArrayList = er.getAllExits();
+        ArrayList<String> mrStrs = new ArrayList<String>();
+        for (MonsterRoom monsterRoom : monsterRooms) {
+            mrStrs.add(monsterRoom.toString());
+        }
+        return mrStrs;
+
+    }*/
+
+
+
 
 }

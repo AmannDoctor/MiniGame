@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import controller.CreateFilesController;
 import gameExceptions.*;
+import view.ConsoleUI;
 
 
 /**
@@ -17,7 +18,7 @@ import gameExceptions.*;
 public class GameStart {
 
     public static void main(String[] args) {
-        File dbFile = new File("ScientistDBNew");
+        File dbFile = new File("ScientistDBFinalized");
         if (!dbFile.exists()) {
             CreateFilesController cfc = new CreateFilesController();
             try {
@@ -29,7 +30,8 @@ public class GameStart {
         }
 
         Scanner input = new Scanner(System.in);
-
+        ConsoleUI cui = new ConsoleUI();
+        cui.startGame();
 
 
 

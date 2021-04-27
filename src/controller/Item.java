@@ -2,8 +2,10 @@ package controller;
 
 import gameExceptions.InvalidItemException;
 import model.ItemDB;
+import model.MonsterDB;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /** Class: Item
  *Creator: Mackinnon Jackson
@@ -22,6 +24,7 @@ public class Item {
     private double uses;
     private String itemType;
     private int strBonus;
+    private int HPBonus;
 
     /**Method Item
      * Constructor for the Item class
@@ -29,7 +32,12 @@ public class Item {
      *  Creates an blank item
      * */
     public Item(){
-
+    ItemDB imd = new ItemDB();
+        try {
+            id = imd.getNextItemID();
+        } catch (SQLException sqe) {
+            System.out.println(sqe.getMessage());
+        }
 
     }
     /**Method Item
@@ -46,6 +54,11 @@ public class Item {
         this.description=description;
     }
 
+
+    public ArrayList<Item> getAllItems() throws SQLException, ClassNotFoundException {
+        ItemDB idb = new ItemDB();
+        return idb.getAllItems();
+    }
 
     public String getDescription(){
         return description;
@@ -110,6 +123,13 @@ public class Item {
         return strBonus;
     }
 
+    public void setHPBonus(int HPBonus) {
+        this.HPBonus = HPBonus;
+    }
+
+    public int getHPBonus() {
+        return HPBonus;
+    }
 
     @Override
     public String toString() {

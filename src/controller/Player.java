@@ -24,8 +24,10 @@ public class Player {
     private String name;
     private int hp;
     private Item equippedItem;
-    private int str;
-    private int score;
+    private Item equippedArmor;
+    private int str, score,armor;
+    private Boolean isEquipedWeapon = false;
+    private Boolean isEquipedArmor = false;
 
 
 
@@ -51,7 +53,6 @@ public class Player {
         this.name=Name;
         hp=100;
         str=10;
-
         inventory = new ArrayList<>();}
 
     /** Method: PrintInventory
@@ -77,7 +78,6 @@ public class Player {
 
 
     public void addItem(Item it){
-
         inventory.add(it);
 
     }
@@ -122,6 +122,55 @@ public class Player {
     public String getName() {
         return name;
     }
+    public void equipItem(Item it){
+
+
+        if( it.getHPBonus() == 0 && isEquipedWeapon == false) {
+            equippedItem = it;
+            it.getStrBonus();
+            isEquipedWeapon = true;
+
+            System.out.println(it.getStrBonus());
+            str = str + it.getStrBonus();
+            System.out.println("your new Strength is " + str + ".");
+        }
+        //armor check
+        else if(it.getHPBonus() != 0 && isEquipedArmor == false){
+            equippedArmor = it;
+            isEquipedArmor= true;
+            it.getHPBonus();
+
+            System.out.println(it.getHPBonus());
+            armor = armor + it.getHPBonus();
+            System.out.println("Your new armor is " + armor + ".");
+        }
+        else
+            System.out.println("You Seemed to already have " + it + " equipped.");
+    }
+
+    public void unEquip(Item it){
+
+        if( equippedItem != null && equippedItem == it && isEquipedWeapon == true) {
+            it.getStrBonus();
+
+            isEquipedWeapon = false;
+            System.out.println(it.getStrBonus());
+            str = str - it.getStrBonus();
+            System.out.println("your new Strength is " + str + ".");
+        }
+        //armor check
+        else if(equippedArmor != null && equippedArmor== it && isEquipedArmor == true){
+            it.getHPBonus();
+
+            isEquipedArmor = false;
+            System.out.println(it.getHPBonus());
+            armor = armor - it.getHPBonus();
+            System.out.println("Your new armor is " + armor + ".");
+        }
+
+
+    }
+
 }
 
 

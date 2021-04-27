@@ -28,6 +28,7 @@ public class GameDBCreate {
         buildRoom();
         buildMonster();
         buildMonsterRoom();
+
     }
 
     /**
